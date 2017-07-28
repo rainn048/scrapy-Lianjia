@@ -13,7 +13,6 @@ class QuotesSpider(scrapy.Spider):
 
     start_urls = [
         'https://bj.lianjia.com/ershoufang/',
-        #'http://captcha.lianjia.com/?redirect=http://bj.lianjia.com/ershoufang/',
     ]
 
     def parse(self, response):
