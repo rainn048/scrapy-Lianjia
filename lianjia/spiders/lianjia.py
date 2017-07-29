@@ -6,6 +6,7 @@ Created on Mon Jul 24 12:38:12 2017
 """
 
 import scrapy
+import re
 from lianjia.items import LianjiaItem
 
 class QuotesSpider(scrapy.Spider):
@@ -20,7 +21,15 @@ class QuotesSpider(scrapy.Spider):
         urls = response.xpath("//ul[@class='sellListContent']/li/a/attribute::href").extract()
         for each_url in urls:
             yield scrapy.Request(each_url, self.parse_detail_page)
-            
+			
+        page = response.xpath("//div[@class='page-box house-lst-page-box'][@page-data]").re("\d+")
+        p = re.compile(r'[^\d]+')
+        #这里是判断有没有下一页，毕竟不是所有区都是有第100页的，不能for循环到100
+        if len(page)>1 and page[0] != page[1]:
+            next_page = p.match(response.url).group()+str(int(page[1])+1)
+            next_page = response.urljoin(next_page)
+            print(next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
             
     def parse_detail_page(self, response):
         baseInfo ={}
