@@ -16,18 +16,29 @@ class QuotesSpider(scrapy.Spider):
         'https://bj.lianjia.com/ershoufang/',
     ]
 
+    
+    
+    
+    
     def parse(self, response):
         #urls  = response.xpath("body/div/div/ul/li/div/div//a/attribute::href").extract()
-        urls = response.xpath("//ul[@class='sellListContent']/li/a/attribute::href").extract()
-        for each_url in urls:
-            yield scrapy.Request(each_url, self.parse_detail_page)
-			
+        #urls = response.xpath("//ul[@class='sellListContent']/li/a/attribute::href").extract()
+        #for each_url in urls:
+        #    yield scrapy.Request(each_url, self.parse_detail_page)
+        
+           
         page = response.xpath("//div[@class='page-box house-lst-page-box'][@page-data]").re("\d+")
         p = re.compile(r'[^\d]+')
         #这里是判断有没有下一页，毕竟不是所有区都是有第100页的，不能for循环到100
+        print(response.url)
+        print(response.status)
+        #print(response.text)
+        print(response.replace)
+        print(response.request)
         if len(page)>1 and page[0] != page[1]:
-            next_page = p.match(response.url).group()+str(int(page[1])+1)
-            next_page = response.urljoin(next_page)
+            #next_page = p.match(response.url).group()+str(int(page[1])+1)
+            next_page = response.urljoin("https://bj.lianjia.com/ershoufang/pg"+str(int(page[1])+1))
+            print('********************************')
             print(next_page)
             yield scrapy.Request(next_page, callback=self.parse)
             
@@ -53,5 +64,5 @@ class QuotesSpider(scrapy.Spider):
             print(value)
             baseInfo[label]=value
         item['base']=baseInfo
-		
+        
         yield item
