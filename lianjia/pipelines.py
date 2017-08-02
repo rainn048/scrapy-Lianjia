@@ -9,4 +9,4 @@
 class LianjiaPipeline(object):
     def process_item(self, item, spider):
         with open("lianjia.txt",'a') as fp:
-            fp.write(item['title']+'@'+item['price']+'@'+item['communityName']+'@'+item['areaName']+'\n')
+            fp.write(item['title']+'@'+item['price']+'@'+item['communityName']+'@'+item['areaName']+'@'+item['base']+'@'+item['more']+'@'+item['url']+'\n')

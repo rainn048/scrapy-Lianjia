@@ -22,9 +22,9 @@ class QuotesSpider(scrapy.Spider):
     
     def parse(self, response):
         #urls  = response.xpath("body/div/div/ul/li/div/div//a/attribute::href").extract()
-        #urls = response.xpath("//ul[@class='sellListContent']/li/a/attribute::href").extract()
-        #for each_url in urls:
-        #    yield scrapy.Request(each_url, self.parse_detail_page)
+        urls = response.xpath("//ul[@class='sellListContent']/li/a/attribute::href").extract()
+        for each_url in urls:
+            yield scrapy.Request(each_url, self.parse_detail_page)
         
            
         page = response.xpath("//div[@class='page-box house-lst-page-box'][@page-data]").re("\d+")
@@ -43,26 +43,33 @@ class QuotesSpider(scrapy.Spider):
             yield scrapy.Request(next_page, callback=self.parse)
             
     def parse_detail_page(self, response):
-        baseInfo ={}
+        
         item = LianjiaItem()
         item['title'] = response.xpath("//h1[@class='main']/text()").extract_first()
         item['price'] = response.xpath("//div[@class='price ']/span[@class='total']/text()").extract_first()
         item['communityName']=response.xpath("//div[@class='communityName']/a[@class='info']/text()").extract_first()
         item['areaName']=response.xpath("//div[@class='areaName']/span[@class='info']/a/text()").extract_first()
-        
+        item['url']=response.url
+        baseInfo =""
         basea = response.xpath("//div[@class='content']/ul/li")
         for each in basea:
             label = each.xpath("./span/text()").extract_first()
             value = each.xpath("./text()").extract_first()
-            baseInfo[label]=value
+            if label and value is not None:
+                baseInfo+=label.strip()+": "+value.strip()+"@"
+        item['base']=baseInfo
         
+        moreInfo=""
         more = response.xpath("//div[@class='introContent showbasemore']/div")
         for each in more[0:-2]:
             label = each.xpath("./div[@class='name']/text()").extract_first()
-            print(label)
             value = each.xpath("./div[@class='content']/text()").extract_first()
-            print(value)
-            baseInfo[label]=value
-        item['base']=baseInfo
+            if label and value is not None:
+                moreInfo+=label.strip()+": "+value.strip()+"@"
+        
+        item['more']=moreInfo
+        print("**************")
+        print(baseInfo)
+        print(moreInfo)
         
         yield item

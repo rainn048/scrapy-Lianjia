@@ -14,5 +14,7 @@ class LianjiaItem(scrapy.Item):
     title = scrapy.Field()
     price = scrapy.Field()
     base = scrapy.Field()
+    more = scrapy.Field()
     communityName = scrapy.Field()
     areaName = scrapy.Field()
+    url = scrapy.Field()
